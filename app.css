@@ -1,0 +1,16 @@
+.card {
+  background-color: black;
+  border: 1px solid black;
+  float: left;
+  height: 100px;
+  margin: 1rem;
+  width: 100px;
+}
+
+.selected {
+  background-color: white;
+}
+
+.matched {
+  background-color: green;
+}
