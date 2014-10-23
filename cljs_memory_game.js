@@ -12,4 +12,5 @@ goog.addDependency("../clojure/string.js", ['clojure.string'], ['goog.string', '
 goog.addDependency("../dommy/attrs.js", ['dommy.attrs'], ['cljs.core', 'dommy.utils', 'clojure.string']);
 goog.addDependency("../dommy/template.js", ['dommy.template'], ['cljs.core', 'dommy.attrs', 'dommy.utils', 'clojure.string']);
 goog.addDependency("../dommy/core.js", ['dommy.core'], ['dommy.template', 'cljs.core', 'dommy.attrs', 'dommy.utils', 'clojure.string']);
-goog.addDependency("../cljs_memory_game/core.js", ['cljs_memory_game.core'], ['cljs.core', 'cljs.core.async', 'dommy.core', 'dommy.utils']);
+goog.addDependency("../cljs_memory_game/card.js", ['cljs_memory_game.card'], ['cljs.core', 'dommy.core']);
+goog.addDependency("../cljs_memory_game/core.js", ['cljs_memory_game.core'], ['cljs.core', 'cljs.core.async', 'cljs_memory_game.card', 'dommy.core']);

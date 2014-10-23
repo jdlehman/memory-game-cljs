@@ -1,47 +1,16 @@
 (ns cljs-memory-game.core
   (:require-macros [cljs.core.async.macros :refer [go]]
-                   [dommy.macros :refer [node sel sel1]])
-  (:require [dommy.utils :as utils]
-            [dommy.core :as dommy]
+                   [dommy.macros :refer [sel]])
+  (:require [dommy.core :as dommy]
+            [cljs-memory-game.card :as card]
             [cljs.core.async :refer [put! chan <! >!]]))
-
-(def cards
-  {"1" :a "2" :b "3" :c "4" :b "5" :a "6" :c})
-
-(defn get-id [card]
-  (dommy/attr card :id))
-
-(defn get-card-val [card]
-  (cards (get-id card)))
-
-(defn can-select-card? [card]
-  (not
-    (or (dommy/has-class? card :selected)
-        (dommy/has-class? card :matched)
-        (> (count (sel :.selected)) 1))))
-
 
 (defn card-click [event clicks-chan]
   (let [card (.-currentTarget event)]
-    (when (can-select-card? card)
+    (when (card/can-select? card)
       (dommy/add-class! card :selected)
-      (dommy/append! card (name (get-card-val card)))
+      (dommy/append! card (name (card/get-val card)))
       (put! clicks-chan card))))
-
-(defn reset-cards! []
-  (doall (map #(dommy/set-html! % "")
-              (sel :.selected)))
-  (doall (map #(dommy/remove-class! % :selected)
-              (sel :.selected))))
-
-
-(defn match? [card1 card2]
-  (= (get-card-val card1) (get-card-val card2)))
-
-(defn check-match [card1 card2]
-  (if (match? card1 card2)
-    (doall (map #(dommy/add-class! % :matched)
-                [card1 card2]))))
 
 (defn init []
   (let [clicks-chan (chan)]
@@ -50,7 +19,7 @@
     (go (while true
       (let [card1 (<! clicks-chan)
             card2 (<! clicks-chan)]
-        (check-match card1 card2)
-        (js/setTimeout reset-cards! 1000))))))
+        (card/check-match card1 card2)
+        (js/setTimeout card/reset-all! 1000))))))
 
 (init)
