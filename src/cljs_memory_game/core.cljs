@@ -5,9 +5,6 @@
             [dommy.core :as dommy]
             [cljs.core.async :refer [put! chan <! >!]]))
 
-; channel to store card clicks on
-(def card-clicks-chan (chan))
-
 (def cards
   {"1" :a "2" :b "3" :c "4" :b "5" :a "6" :c})
 
@@ -24,12 +21,12 @@
         (> (count (sel :.selected)) 1))))
 
 
-(defn card-click [event]
+(defn card-click [event clicks-chan]
   (let [card (.-currentTarget event)]
     (when (can-select-card? card)
       (dommy/add-class! card :selected)
       (dommy/append! card (name (get-card-val card)))
-      (put! card-clicks-chan card))))
+      (put! clicks-chan card))))
 
 (defn reset-cards! []
   (doall (map #(dommy/set-html! % "")
@@ -47,12 +44,13 @@
                 [card1 card2]))))
 
 (defn init []
-  (doseq [element (sel :.card)]
-    (dommy/listen! element :click card-click))
-  (go (while true
-    (let [card1 (<! card-clicks-chan)
-          card2 (<! card-clicks-chan)]
-      (check-match card1 card2)
-      (js/setTimeout reset-cards! 1000)))))
+  (let [clicks-chan (chan)]
+    (doseq [element (sel :.card)]
+      (dommy/listen! element :click #(card-click % clicks-chan)))
+    (go (while true
+      (let [card1 (<! clicks-chan)
+            card2 (<! clicks-chan)]
+        (check-match card1 card2)
+        (js/setTimeout reset-cards! 1000))))))
 
 (init)
