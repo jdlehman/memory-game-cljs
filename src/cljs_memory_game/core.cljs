@@ -9,10 +9,11 @@
   (let [card (.-currentTarget event)]
     (when (card/can-select? card)
       (dommy/add-class! card :selected)
-      (dommy/append! card (name (card/get-val card)))
+      (dommy/append! card (card/get-val card))
       (put! clicks-chan card))))
 
 (defn init []
+  (card/setup!)
   (let [clicks-chan (chan)]
     (doseq [element (sel :.card)]
       (dommy/listen! element :click #(card-click % clicks-chan)))

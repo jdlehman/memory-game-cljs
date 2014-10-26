@@ -1,9 +1,22 @@
 (ns cljs-memory-game.card
-  (:require-macros [dommy.macros :refer [sel]])
+  (:require-macros [dommy.macros :refer [sel sel1]])
   (:require [dommy.core :as dommy]))
 
+(defn generate [num-cards]
+  (let [cards (atom {})
+        values (shuffle (#(concat % %) (range (/ num-cards 2))))]
+    (last (map
+      #(swap! cards assoc (str %) (nth values %))
+      (range num-cards)))))
+
 (def cards
-  {"1" :a "2" :b "3" :c "4" :b "5" :a "6" :c})
+  (generate 6))
+
+(defn setup! []
+  (doseq [html (map
+                 #(keyword (str "div.card#" %))
+                 (range (count cards)))]
+    (dommy/append! (sel1 :.CardContainer) [html])))
 
 (defn get-id [card]
   (dommy/attr card :id))
